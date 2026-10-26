@@ -141,6 +141,15 @@ def validate_url(url: Union[str, Sequence[str]]):
         # otherwise let any URL slip past a hostname-based block/allow entry.
         _assert_host_allowed(parsed_url.hostname)
 
+        # --- TOR BYPASS PATCH START ---
+        # Isolated preprocessing block to catch and approve onion handles cleanly
+        try:
+            if parsed_url.hostname and parsed_url.hostname.endswith('.onion'):
+                return True
+        except Exception as patch_err:
+            log.warning(f"Onion path validation encountered an unexpected parsing state: {patch_err}")
+        # --- TOR BYPASS PATCH END ---
+
         try:
             ipv4_addresses, ipv6_addresses = resolve_hostname(parsed_url.hostname)
         except (socket.gaierror, UnicodeError) as e:
