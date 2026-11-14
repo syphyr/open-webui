@@ -213,6 +213,8 @@ COPY --chown=$UID:$GID --from=build /app/package.json /app/package.json
 # copy backend files with the ownership and static permissions prepared above
 COPY --from=build /app/backend .
 
+RUN apt-get update && apt-get install -y --no-install-recommends pandoc libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-2.0-0 libcairo2 && rm -rf /var/lib/apt/lists/* && pip install --no-cache-dir fpdf2 python-docx weasyprint markdown
+
 EXPOSE 8080
 
 HEALTHCHECK CMD curl --silent --fail http://localhost:${PORT:-8080}/health | jq -ne 'input.status == true' || exit 1
