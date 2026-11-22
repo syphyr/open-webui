@@ -779,7 +779,11 @@ async def image_generations(
         elif connection['type'] == 'automatic1111':
             # The checkpoint is shared by everyone on this backend. Only models an admin listed on
             # the connection reach here, so switching to one is what the admin allowed.
-            await set_automatic1111_model(connection, model)
+            try:
+                await set_automatic1111_model(connection, model)
+            except aiohttp.ClientResponseError as e:
+                if e.status != 404:
+                    raise
 
             data = {
                 'prompt': form_data.prompt,
